@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+  {% include 'head.html' %}
+
+  <body>
+
+    {% include 'header.html' %}
+
+    <div class="row container">
+		<br>
+		<h3 class="header">{{ item.name }}</h3>
+	  	<div class="divider"></div>
+		<br>
+
+		{{ item.summary }} <a href="#description">More...</a>
+
+		<blockquote>
+			<code>{{ item.import }}</code>
+		</blockquote>
+
+		<h4 id="description">Detailed Description</h4>
+		<div class="divider"></div>
+
+		{% if item.description %}
+			{{ item.description }}
+		{% else %}
+			<i class="light">No description provided.</i>
+		{% endif %}
+
+		<h4>Properties</h4>
+		<div class="divider"></div>
+
+		{% for property in item.properties %}
+
+			<h5 id="{{ property.id }}">{{ property.name }}</h5>
+
+			{% if property.description %}
+				{{ property.description }}
+			{% else %}
+				<i class="light">No description provided.</i>
+			{% endif %}
+		{% endfor %}
+
+		<h4>Methods</h4>
+
+		{% for method in item.methods %}
+
+			<h5 id="{{ method.id }}">{{ method.name }}</h5>
+
+			{% if method.description %}
+				{{ method.description }}
+			{% else %}
+				<i class="light">No description provided.</i>
+			{% endif %}
+		{% endfor %}
+    </div>
+
+    {% include "footer.html" %}
+
+    <script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/materialize.js"></script>
+
+  </body>
+
+</html>
