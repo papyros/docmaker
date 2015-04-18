@@ -14,6 +14,36 @@ resource_dir = os.path.dirname(exe) + '/resources'
 env = Environment(loader=FileSystemLoader('template'), 
         extensions=['jinja2_highlight.HighlightExtension'])
 
+class DocIndex():
+    json = {}
+
+    def __init__(self, xml):
+        self.xml = xml
+
+    def parse(self):
+        self.json = {
+            'title': self.xml.get('title'),
+            'modules': [self.parse_module(module) for module in self.xml.findall('./namespace')]
+        }
+
+    def parse_module(self, xml):
+        return {
+            'name': xml.get('module'),
+            'classes': [self.parse_class(cls) for cls in xml.findall('./qmlclass')]
+        }
+
+    def parse_class(self, xml):
+        return {
+            'name': xml.get('name'),
+            'summary': xml.get('brief'),
+            'url': xml.get('href').replace('.dita', '.html')
+        }
+
+    def render(self):
+        template = env.get_template('index.html')
+        return template.render(self.json)
+
+
 class Docfile():
     json = {}
 
@@ -22,7 +52,8 @@ class Docfile():
 
     def parse(self):
         self.json['docs'] = {
-            'title': self.xml.findtext('./prolog/metadata/prodinfo/prodname')
+            'title': self.xml.findtext('./prolog/metadata/prodinfo/prodname'),
+            'description': ''
         }
 
         properties = []
@@ -89,12 +120,14 @@ def format_xml(xml):
 if __name__=='__main__':
     out_dir = sys.argv[2]
 
+    copy_tree(resource_dir, out_dir)
+
     for filename in os.listdir(sys.argv[1]):
         if filename.endswith('.dita'):
             try:
                 with open(sys.argv[1] + '/' + filename) as f:
                     docfile = Docfile(ElementTree.parse(f))
-                    docfile.parse()
+                docfile.parse()
 
                 html_file = filename.replace('.dita', '.html')
 
@@ -102,5 +135,10 @@ if __name__=='__main__':
                     out.write(docfile.render())
             except Exception as e:
                 print("Unable to render " + filename + ": " + str(e))
-
-    copy_tree(resource_dir, out_dir)
+        elif filename.endswith('.index'):
+            with open(sys.argv[1] + '/' + filename) as f:
+                docindex = DocIndex(ElementTree.parse(f).getroot())
+            docindex.parse()
+                
+            with open(out_dir + '/index.html', 'w') as out:
+                out.write(docindex.render())
