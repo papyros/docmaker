@@ -9,10 +9,10 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
 exe = os.path.realpath(sys.argv[0])
+template_dir = os.path.dirname(exe) + '/template'
 resource_dir = os.path.dirname(exe) + '/resources'
 
-env = Environment(loader=FileSystemLoader('template'), 
-        extensions=['jinja2_highlight.HighlightExtension'])
+env = Environment(loader=FileSystemLoader(template_dir))
 
 class DocIndex():
     json = {}
