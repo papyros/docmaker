@@ -22,7 +22,8 @@ class DocIndex():
 
     def parse(self):
         self.json = {
-            'title': self.xml.get('title'),
+            'site_title': self.xml.get('title'),
+            'author': 'Papyros',
             'modules': [self.parse_module(module) for module in self.xml.findall('./namespace')]
         }
 
@@ -51,41 +52,34 @@ class Docfile():
         self.xml = xml
 
     def parse(self):
-        self.json['docs'] = {
-            'title': self.xml.findtext('./prolog/metadata/prodinfo/prodname'),
-            'description': ''
+        self.json = {
+            'title': self.xml.findtext('./apiName'),
+            'site_title': self.xml.findtext('./prolog/metadata/prodinfo/prodname'),
+            'author': 'Papyros',
+            'description': '',
+            'class': {
+                'name': self.xml.findtext('./apiName'),
+                'summary': self.xml.findtext('./shortdesc'),
+                'description': format_xml(self.xml.find('./qmlTypeDetail/apiDesc')),
+                'import': ('import ' + self.xml.findtext('./qmlTypeDetail/qmlImportModule/apiItemName') +
+                        ' ' + self.xml.findtext('./qmlTypeDetail/qmlImportModule/apiData')),
+                'properties': [self.parse_property(prop) for prop in self.xml.findall('./qmlProperty')],
+                'methods': [self.parse_method(method) for method in self.xml.findall('./qmlMethod')]
+            }
         }
 
-        properties = []
+    def parse_property(self, xml):
+        return {
+            'id': xml.findtext('./apiName'),
+            'name': format_xml(xml.find('./qmlPropertyDetail/qmlPropertyDef/apiData')),
+            'description': format_xml(xml.find('./qmlPropertyDetail/apiDesc'))
+        }
 
-        for prop in self.xml.findall('./qmlProperty'):
-            info = {
-                'id': prop.findtext('./apiName'),
-                'name': format_xml(prop.find('./qmlPropertyDetail/qmlPropertyDef/apiData')),
-                'description': format_xml(prop.find('./qmlPropertyDetail/apiDesc'))
-            }
-
-            properties.append(info)
-
-        methods = []
-
-        for method in self.xml.findall('./qmlMethod'):
-            info = {
-                'id': method.findtext('./apiName'),
-                'name': format_xml(method.find('./qmlMethodDetail/qmlMethodDef/apiData')),
-                'description': format_xml(method.find('./qmlMethodDetail/apiDesc'))
-            }
-
-            methods.append(info)
-
-        self.json['item'] = {
-            'name': self.xml.findtext('./apiName'),
-            'summary': self.xml.findtext('./shortdesc'),
-            'description': format_xml(self.xml.find('./qmlTypeDetail/apiDesc')),
-            'import': ('import ' + self.xml.findtext('./qmlTypeDetail/qmlImportModule/apiItemName') +
-                    ' ' + self.xml.findtext('./qmlTypeDetail/qmlImportModule/apiData')),
-            'properties': properties,
-            'methods': methods
+    def parse_method(self, xml):
+        return {
+            'id': xml.findtext('./apiName'),
+            'name': format_xml(xml.find('./qmlMethodDetail/qmlMethodDef/apiData')),
+            'description': format_xml(xml.find('./qmlMethodDetail/apiDesc'))
         }
 
     def render(self):

@@ -9,29 +9,49 @@
 
     <div class="container">
 		<br>
-		<h3 class="header">{{ item.name }}</h3>
+		<h3 class="header">{{ class.name }}</h3>
 	  	<div class="divider"></div>
 		<br>
 
-		{{ item.summary }} <a href="#description">More...</a>
+		{{ class.summary }} <a href="#description">More...</a>
 
 		<blockquote>
-			<code>{{ item.import }}</code>
+			<code>{{ class.import }}</code>
 		</blockquote>
+
+		<h5>Properties and Methods</h5>
+		
+		<ul>
+		{% for property in class.properties %}
+			<li>
+				<i class="tiny mdi-navigation-chevron-right" style="vertical-align: -8%"></i>
+				<a href="#{{ property.id }}">{{ property.name }}</a>
+			</li>
+		{% endfor %}
+
+		{% for method in class.methods %}
+			<li>
+				<i class="tiny mdi-navigation-chevron-right" style="vertical-align: -8%"></i>
+				<a href="#{{ method.id }}">{{ method.name }}</a>
+			</li>
+		{% endfor %}
+		</ul>
 
 		<h4 id="description">Detailed Description</h4>
 		<div class="divider"></div>
 
-		{% if item.description %}
-			{{ item.description }}
+		{% if class.description %}
+			{{ class.description }}
 		{% else %}
 			<i class="light">No description provided.</i>
 		{% endif %}
 
-		<h4>Properties</h4>
-		<div class="divider"></div>
+		{% if class.properties|length > 0 %}
+			<h4>Properties</h4>
+			<div class="divider"></div>
+		{% endif %}
 
-		{% for property in item.properties %}
+		{% for property in class.properties %}
 
 			<h5 id="{{ property.id }}">{{ property.name }}</h5>
 
@@ -42,9 +62,12 @@
 			{% endif %}
 		{% endfor %}
 
-		<h4>Methods</h4>
+		{% if class.methods|length > 0 %}
+			<h4>Methods</h4>
+			<div class="divider"></div>
+		{% endif %}
 
-		{% for method in item.methods %}
+		{% for method in class.methods %}
 
 			<h5 id="{{ method.id }}">{{ method.name }}</h5>
 
@@ -54,6 +77,8 @@
 				<i class="light">No description provided.</i>
 			{% endif %}
 		{% endfor %}
+
+		<br/>
     </div>
 
     {% include "footer.html" %}

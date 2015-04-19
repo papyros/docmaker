@@ -31,7 +31,13 @@
 		            				{{ class.name }}
 		            			</a>
 		            		</td>
-		            		<td>{{ class.summary }}</td>
+		            		<td>
+		            			{% if class.summary %}
+		            				{{ class.summary }}
+		            			{% else %}
+									<i class="light">No description provided.</i>
+								{% endif %}
+		            		</td>
 		          		</tr>
 	            	{% endfor %}
 		        </tbody>
