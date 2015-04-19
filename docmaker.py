@@ -64,7 +64,8 @@ class Docfile():
                 'import': ('import ' + self.xml.findtext('./qmlTypeDetail/qmlImportModule/apiItemName') +
                         ' ' + self.xml.findtext('./qmlTypeDetail/qmlImportModule/apiData')),
                 'properties': [self.parse_property(prop) for prop in self.xml.findall('./qmlProperty')],
-                'methods': [self.parse_method(method) for method in self.xml.findall('./qmlMethod')]
+                'methods': [self.parse_method(method) for method in self.xml.findall('./qmlMethod')],
+                'signals': [self.parse_signal(signal) for signal in self.xml.findall('./qmlSignal')]
             }
         }
 
@@ -80,6 +81,13 @@ class Docfile():
             'id': xml.findtext('./apiName'),
             'name': format_xml(xml.find('./qmlMethodDetail/qmlMethodDef/apiData')),
             'description': format_xml(xml.find('./qmlMethodDetail/apiDesc'))
+        }
+
+    def parse_signal(self, xml):
+        return {
+            'id': xml.findtext('./apiName'),
+            'name': format_xml(xml.find('./qmlSignalDetail/qmlSignalDef/apiData')),
+            'description': format_xml(xml.find('./qmlSignalDetail/apiDesc'))
         }
 
     def render(self):

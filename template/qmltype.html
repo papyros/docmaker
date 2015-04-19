@@ -35,6 +35,13 @@
 				<a href="#{{ method.id }}">{{ method.name }}</a>
 			</li>
 		{% endfor %}
+
+		{% for signal in class.signals %}
+			<li>
+				<i class="tiny mdi-navigation-chevron-right" style="vertical-align: -8%"></i>
+				<a href="#{{ signal.id }}">signal {{ signal.name }}</a>
+			</li>
+		{% endfor %}
 		</ul>
 
 		<h4 id="description">Detailed Description</h4>
@@ -73,6 +80,22 @@
 
 			{% if method.description %}
 				{{ method.description }}
+			{% else %}
+				<i class="light">No description provided.</i>
+			{% endif %}
+		{% endfor %}
+
+		{% if class.signals|length > 0 %}
+			<h4>Signals</h4>
+			<div class="divider"></div>
+		{% endif %}
+
+		{% for signal in class.signals %}
+
+			<h5 id="{{ signal.id }}">signal {{ signal.name }}</h5>
+
+			{% if signal.description %}
+				{{ signal.description }}
 			{% else %}
 				<i class="light">No description provided.</i>
 			{% endif %}
