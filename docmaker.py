@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 
 import json, sys, os, os.path
 from distutils.dir_util import copy_tree
@@ -126,7 +126,7 @@ if __name__=='__main__':
                 html_file = filename.replace('.dita', '.html')
 
                 with open(out_dir + '/' + html_file, 'w') as out:
-                    out.write(docfile.render())
+                    out.write(docfile.render().encode('utf8'))
             except Exception as e:
                 print("Unable to render " + filename + ": " + str(e))
         elif filename.endswith('.index'):
@@ -135,4 +135,4 @@ if __name__=='__main__':
             docindex.parse()
                 
             with open(out_dir + '/index.html', 'w') as out:
-                out.write(docindex.render())
+                out.write(docindex.render().encode('utf8'))
