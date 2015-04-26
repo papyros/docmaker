@@ -105,6 +105,7 @@ def format_xml(xml):
 
     for item in xml.iter('xref'):
         item.tag = 'a'
+        item.set('href', item.get('href').replace('.dita', '.html'))
     for item in xml.iter('codeblock'):
         tail = item.tail
         code = ''.join(item.itertext())
@@ -114,6 +115,17 @@ def format_xml(xml):
         item.clear()
         item.tail = tail
         item.append(ElementTree.fromstring(format_code(code, language)))
+    for item in xml.iter('fig'):
+        src = item.find('./image').get('href')
+        caption = item.findtext('./image/alt')
+        tail = item.tail
+
+        item.clear()
+        item.tag = 'img'
+        item.set('src', src)
+        item.set('class', 'materialboxed')
+        item.set('data-caption', caption)
+        item.tail = tail
     
     elements = [ElementTree.tostring(item).decode("utf-8") for item in xml]
 
@@ -123,6 +135,7 @@ if __name__=='__main__':
     out_dir = sys.argv[2]
 
     copy_tree(resource_dir, out_dir)
+    copy_tree(sys.argv[1] + '/images', out_dir + '/images')
 
     for filename in os.listdir(sys.argv[1]):
         if filename.endswith('.dita'):
