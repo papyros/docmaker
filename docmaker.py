@@ -71,21 +71,21 @@ class Docfile():
 
     def parse_property(self, xml):
         return {
-            'id': xml.findtext('./apiName'),
+            'id': xml.get('id'),
             'name': format_xml(xml.find('./qmlPropertyDetail/qmlPropertyDef/apiData')),
             'description': format_xml(xml.find('./qmlPropertyDetail/apiDesc'))
         }
 
     def parse_method(self, xml):
         return {
-            'id': xml.findtext('./apiName'),
+            'id': xml.get('id'),
             'name': format_xml(xml.find('./qmlMethodDetail/qmlMethodDef/apiData')),
             'description': format_xml(xml.find('./qmlMethodDetail/apiDesc'))
         }
 
     def parse_signal(self, xml):
         return {
-            'id': xml.findtext('./apiName'),
+            'id': xml.get('id'),
             'name': format_xml(xml.find('./qmlSignalDetail/qmlSignalDef/apiData')),
             'description': format_xml(xml.find('./qmlSignalDetail/apiDesc'))
         }
