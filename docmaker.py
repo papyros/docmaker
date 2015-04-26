@@ -14,6 +14,7 @@ resource_dir = os.path.dirname(exe) + '/resources'
 
 env = Environment(loader=FileSystemLoader(template_dir))
 
+
 class DocIndex():
     json = {}
 
@@ -30,7 +31,8 @@ class DocIndex():
     def parse_module(self, xml):
         return {
             'name': xml.get('module'),
-            'classes': [self.parse_class(cls) for cls in xml.findall('./qmlclass')]
+            'classes': self.parse_list(xml, 'qmlclass', self.parse_class, 
+                                       key=lambda cls: cls['name'])
         }
 
     def parse_class(self, xml):
@@ -44,6 +46,10 @@ class DocIndex():
         template = env.get_template('index.html')
         return template.render(self.json)
 
+    def parse_list(self, xml, tag, function, key):
+        items = [function(item) for item in xml.findall('./' + tag)]
+        
+        return sorted(items, key=key)
 
 class Docfile():
     json = {}
@@ -63,9 +69,12 @@ class Docfile():
                 'description': format_xml(self.xml.find('./qmlTypeDetail/apiDesc')),
                 'import': ('import ' + self.xml.findtext('./qmlTypeDetail/qmlImportModule/apiItemName') +
                         ' ' + self.xml.findtext('./qmlTypeDetail/qmlImportModule/apiData')),
-                'properties': [self.parse_property(prop) for prop in self.xml.findall('./qmlProperty')],
-                'methods': [self.parse_method(method) for method in self.xml.findall('./qmlMethod')],
-                'signals': [self.parse_signal(signal) for signal in self.xml.findall('./qmlSignal')]
+                'properties': self.parse_list('qmlProperty', self.parse_property, 
+                                              key=lambda property: property['name']),
+                'methods': self.parse_list('qmlMethod', self.parse_method, 
+                                           key=lambda method: method['name']),
+                'signals': self.parse_list('qmlSignal', self.parse_signal, 
+                                           key=lambda signal: signal['name'])
             }
         }
 
@@ -93,6 +102,11 @@ class Docfile():
     def render(self):
         template = env.get_template('qmltype.html')
         return template.render(self.json)
+
+    def parse_list(self, tag, function, key):
+        items = [function(item) for item in self.xml.findall('./' + tag)]
+
+        return sorted(items, key=key)
 
 def format_code(code, language):
     lexer = get_lexer_by_name(language, stripall=True)
